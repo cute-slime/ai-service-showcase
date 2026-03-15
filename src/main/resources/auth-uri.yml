@@ -1,0 +1,43 @@
+# ai-service 공개 URI 설정
+# 인증 없이 접근 가능한 엔드포인트 정의
+
+public:
+  # WebSocket 핸드셰이크 요청 (Upgrade: websocket 헤더 포함)
+  websocket:
+    matches: []
+    starts-with: []
+
+  get:
+    matches:
+      # common
+      - /
+      - /favicon.ico
+      - /error
+    starts-with:
+      # common
+      - /webjars
+      - /actuator/
+      - /v3/
+      - /swagger-ui
+      - /v1.0/ping
+
+  post:
+    matches:
+      # common
+      - /error
+    starts-with: []
+
+  put:
+    matches:
+      - /error
+    starts-with: []
+
+  patch:
+    matches:
+      - /error
+    starts-with: []
+
+  delete:
+    matches:
+      - /error
+    starts-with: []

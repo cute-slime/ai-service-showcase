@@ -1,0 +1,147 @@
+# =============================================================================
+# ai-service 운영 환경 설정 (prd 서버)
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# 1. 로깅 설정
+# -----------------------------------------------------------------------------
+logging:
+  level:
+    root: INFO
+    com.jongmin.ai: INFO
+    org.hibernate.SQL: WARN
+
+# -----------------------------------------------------------------------------
+# 2. 서버 설정
+# -----------------------------------------------------------------------------
+server:
+  port: ${SERVER_PORT:8083}
+
+# -----------------------------------------------------------------------------
+# 3. Spring 설정
+# -----------------------------------------------------------------------------
+spring:
+  main:
+    allow-bean-definition-overriding: true
+
+  config:
+    import:
+      - j-config-prd.yml
+
+  application:
+    name: ai-service
+
+  messages:
+    basename: messages/sql
+    encoding: UTF-8
+
+  # PostgreSQL (CloudNativePG - Prd DB)
+  datasource:
+    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/prd}
+    username: ${DATABASE_USERNAME:app_user}
+    password: ${DATABASE_PASSWORD:}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      pool-name: AiService-HikariPool-Prd
+      maximum-pool-size: 5
+      minimum-idle: 2
+      idle-timeout: 300000
+      max-lifetime: 1800000
+      connection-timeout: 30000
+
+  # JPA / Hibernate
+  jpa:
+    open-in-view: false
+    show-sql: false
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        default_schema: ai
+        format_sql: false
+        jdbc:
+          batch_size: 100
+          time_zone: Asia/Seoul
+        order_inserts: true
+        order_updates: true
+
+  # Redis
+  data:
+    web:
+      pageable:
+        one-indexed-parameters: true
+    redis:
+      database: ${REDIS_DATABASE:15}
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
+
+  # Kafka
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+
+  # Cassandra
+  cassandra:
+    contact-points: ${CASSANDRA_CONTACT_POINTS:localhost}
+    local-datacenter: ${CASSANDRA_DATACENTER:datacenter1}
+    keyspace-name: ${CASSANDRA_KEYSPACE:ai_service_prd}
+    username: ${CASSANDRA_USERNAME:cassandra}
+    password: ${CASSANDRA_PASSWORD}
+
+# -----------------------------------------------------------------------------
+# 4. Actuator 설정
+# -----------------------------------------------------------------------------
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus,circuitbreakers
+  endpoint:
+    health:
+      show-details: always
+  health:
+    circuitbreakers:
+      enabled: true
+
+# -----------------------------------------------------------------------------
+# 5. SpringDoc (Swagger) 설정 - 운영 환경 비활성화
+# -----------------------------------------------------------------------------
+springdoc:
+  api-docs:
+    enabled: ${SPRINGDOC_API_DOCS_ENABLED:false}
+  swagger-ui:
+    enabled: ${SPRINGDOC_SWAGGER_UI_ENABLED:false}
+
+# -----------------------------------------------------------------------------
+# 6. Resilience4j Circuit Breaker 설정
+# -----------------------------------------------------------------------------
+resilience4j:
+  circuitbreaker:
+    configs:
+      default:
+        slidingWindowType: COUNT_BASED
+        slidingWindowSize: 10
+        failureRateThreshold: 50
+        waitDurationInOpenState: 30s
+        permittedNumberOfCallsInHalfOpenState: 5
+        slowCallRateThreshold: 80
+        slowCallDurationThreshold: 5s
+    instances:
+      aiService:
+        baseConfig: default
+        failureRateThreshold: 30
+        waitDurationInOpenState: 60s
+        slowCallDurationThreshold: 30s
+      openaiClient:
+        baseConfig: default
+        failureRateThreshold: 30
+        waitDurationInOpenState: 60s
+      anthropicClient:
+        baseConfig: default
+        failureRateThreshold: 30
+        waitDurationInOpenState: 60s
+      externalApi:
+        baseConfig: default

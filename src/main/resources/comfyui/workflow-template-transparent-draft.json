@@ -1,0 +1,109 @@
+{
+  "28": {
+    "class_type": "UNETLoader",
+    "inputs": {
+      "unet_name": "z_image_turbo_bf16.safetensors",
+      "weight_dtype": "default"
+    }
+  },
+  "30": {
+    "class_type": "CLIPLoader",
+    "inputs": {
+      "clip_name": "qwen_3_4b.safetensors",
+      "type": "lumina2",
+      "device": "default"
+    }
+  },
+  "29": {
+    "class_type": "VAELoader",
+    "inputs": {
+      "vae_name": "ae.safetensors"
+    }
+  },
+  "13": {
+    "class_type": "EmptySD3LatentImage",
+    "inputs": {
+      "width": 832,
+      "height": 1216,
+      "batch_size": 1
+    }
+  },
+  "27": {
+    "class_type": "CLIPTextEncode",
+    "inputs": {
+      "text": "Create a full-body character illustration of Detective Inspector Shaw, calm and stern investigator, pipe-smoking british detective, trench coat, focused eyes, old college corridor ambiance. Use a single character only with the entire body visible from head to toe, including both feet. Keep the subject centered with a clean and readable silhouette for easy cutout and dialogue-scene compositing. Use a plain neutral background with minimal detail, no environmental clutter, and stable cinematic lighting. The character should face the viewer in a calm, natural standing pose with consistent proportions and clear edges. Avoid any extra people, text overlays, logos, or decorative foreground objects.",
+      "clip": [
+        "30",
+        0
+      ]
+    }
+  },
+  "33": {
+    "class_type": "ConditioningZeroOut",
+    "inputs": {
+      "conditioning": [
+        "27",
+        0
+      ]
+    }
+  },
+  "3": {
+    "class_type": "KSampler",
+    "inputs": {
+      "model": [
+        "28",
+        0
+      ],
+      "positive": [
+        "27",
+        0
+      ],
+      "negative": [
+        "33",
+        0
+      ],
+      "latent_image": [
+        "13",
+        0
+      ],
+      "seed": 370364061008314,
+      "steps": 4,
+      "cfg": 1,
+      "sampler_name": "res_multistep",
+      "scheduler": "simple",
+      "denoise": 1
+    }
+  },
+  "8": {
+    "class_type": "VAEDecode",
+    "inputs": {
+      "samples": [
+        "3",
+        0
+      ],
+      "vae": [
+        "29",
+        0
+      ]
+    }
+  },
+  "80": {
+    "class_type": "RMBG",
+    "inputs": {
+      "image": [
+        "8",
+        0
+      ]
+    }
+  },
+  "81": {
+    "class_type": "SaveImage",
+    "inputs": {
+      "filename_prefix": "ComfyUI_cutout",
+      "images": [
+        "80",
+        0
+      ]
+    }
+  }
+}

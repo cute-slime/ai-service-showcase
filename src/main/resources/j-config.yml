@@ -1,0 +1,148 @@
+j-config:
+  cors:
+    allowed-origins:
+      - http://localhost:3000
+      - http://localhost:3001
+      - http://localhost:5173
+      - http://127.0.0.1:3000
+      - http://127.0.0.1:5173
+      - https://omnilude.com
+      - https://www.omnilude.com
+      - https://app.omnilude.com
+    allowed-methods:
+      - GET
+      - POST
+      - PUT
+      - PATCH
+      - DELETE
+      - OPTIONS
+    allowed-headers:
+      - Authorization
+      - Content-Type
+      - X-Requested-With
+      - Accept
+      - Origin
+      - Cache-Control
+    allow-credentials: true
+    max-age: 3600
+
+app:
+  env: ${APP_ENV:local}
+  system-token: ${J_SYSTEM_TOKEN}
+  encrypt-password: ${J_ENCRYPT_PASSWORD}
+
+  # Backbone 서비스 연동 (이벤트 발행용)
+  backbone:
+    endpoint: ${BACKBONE_SERVICE_ENDPOINT:http://localhost:8082}
+  system:
+    token: ${J_SYSTEM_TOKEN:}
+
+  # 다국어 설정
+  lang:
+    default: ko
+    supports: ko,en,ja
+
+  # Redis Pub/Sub 토픽 (플랫폼 설정 동기화)
+  redis:
+    pub-sub:
+      security-config-changed: pg-security-config-changed
+      logging-config-changed: pg-logging-config-changed
+      package-log-level-changed: pg-package-log-level-changed
+
+  # Kafka Stream 토픽
+  stream:
+    event:
+      topic:
+        event-app: pg-event.app
+        event-webrtc: pg-event.webrtc
+        event-chat: pg-event.chat
+        event-slack: pg-event.slack
+        event-quiz: pg-event.quiz
+
+  # 미디어 생성 BO API 설정
+  media-generation:
+    max-concurrent-jobs-per-account: 3
+    default-timeout-minutes: 15
+    heartbeat-interval-seconds: 30
+
+  # DTE (Distributed Task Executor) 설정
+  distributed-task-executor:
+    executor:
+      base-url: http://localhost:8083
+    types:
+      PRODUCT_AGENT:
+        max-concurrency: 5
+        max-queue-size: 100
+        priority: 5
+        timeout-seconds: 1800
+      WORKFLOW:
+        max-concurrency: 5
+        max-queue-size: 100
+        priority: 5
+        timeout-seconds: 7200
+      MULTI_AGENT_WORKFLOW:
+        max-concurrency: 3
+        max-queue-size: 50
+        priority: 5
+        timeout-seconds: 7200
+      MEDIA_GENERATION:
+        max-concurrency: 3
+        max-queue-size: 30
+        priority: 5
+        timeout-seconds: 900
+      BO_AI_ASSISTANT_EXECUTE:
+        max-concurrency: 5
+        max-queue-size: 50
+        priority: 5
+        timeout-seconds: 900
+
+  # AWS S3 연동 설정
+  aws:
+    endpoint: https://s3.omnilude.com
+    credentials:
+      access-key-id: ${AWS_ACCESS_KEY:}
+      secret-key: ${AWS_SECRET_KEY:}
+
+  # AI 설정
+  ai:
+    openai:
+      api-key: ${OPENAI_API_KEY:}
+    anthropic:
+      api-key: ${ANTHROPIC_API_KEY:}
+    ollama:
+      base-url: ${OLLAMA_BASE_URL:http://localhost:11434}
+      model:
+        phi-4-14b: ${OLLAMA_MODEL_PHI4:phi4:14b}
+    deepseek:
+      base-url: ${DEEPSEEK_BASE_URL:https://api.deepseek.com}
+      api-key: ${DEEPSEEK_API_KEY:}
+      model:
+        deepseek-chat: ${DEEPSEEK_MODEL_CHAT:deepseek-chat}
+
+  # ChromaDB 벡터 스토어 설정
+  chromadb:
+    base-url: ${CHROMADB_BASE_URL:http://localhost:8000}
+
+  # Auth 서비스 연동 설정
+  auth:
+    endpoint: ${AUTH_SERVICE_ENDPOINT:http://localhost:8081}
+
+  # 웜업 Health Indicator 설정
+  health:
+    warmup:
+      enabled: true
+      initial-delay-count: 3
+      tasks:
+        object-mapper:
+          enabled: true
+        postgresql:
+          enabled: true
+          required: true
+        redis:
+          enabled: true
+          required: false
+
+# AI Assistant 설정
+ai:
+  assistant:
+    translator-name: translator

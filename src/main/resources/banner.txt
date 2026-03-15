@@ -1,0 +1,15 @@
+${AnsiColor.CYAN}
+     █████╗ ██╗    ███████╗███████╗██████╗ ██╗   ██╗██╗ ██████╗███████╗
+    ██╔══██╗██║    ██╔════╝██╔════╝██╔══██╗██║   ██║██║██╔════╝██╔════╝
+    ███████║██║    ███████╗█████╗  ██████╔╝██║   ██║██║██║     █████╗
+    ██╔══██║██║    ╚════██║██╔══╝  ██╔══██╗╚██╗ ██╔╝██║██║     ██╔══╝
+    ██║  ██║██║    ███████║███████╗██║  ██║ ╚████╔╝ ██║╚██████╗███████╗
+    ╚═╝  ╚═╝╚═╝    ╚══════╝╚══════╝╚═╝  ╚═╝  ╚═══╝  ╚═╝ ╚═════╝╚══════╝
+${AnsiColor.WHITE}
+    ┌──────────────────────────────────────────────────────────────────┐
+    │  ${AnsiColor.BRIGHT_MAGENTA}LangChain4J${AnsiColor.WHITE} • ${AnsiColor.BRIGHT_GREEN}Multi AI Provider${AnsiColor.WHITE}                               │
+    │  ${AnsiColor.BRIGHT_CYAN}30+ Node Types${AnsiColor.WHITE} • ${AnsiColor.BRIGHT_RED}RAG${AnsiColor.WHITE} • ${AnsiColor.BRIGHT_WHITE}AI Workflow Engine${AnsiColor.WHITE}                 │
+    └──────────────────────────────────────────────────────────────────┘
+${AnsiColor.BRIGHT_BLACK}
+    Powered by Spring Boot ${spring-boot.formatted-version}
+    Active Profile: ${AnsiColor.BRIGHT_GREEN}${spring.profiles.active:default}${AnsiColor.DEFAULT}

@@ -1,0 +1,60 @@
+# eclipse specific git ignore
+.project
+.metadata
+.classpath
+.settings/
+
+# Locally stored "Eclipse launch configurations"
+*.launch
+
+# intellij specific git ignore
+.idea
+*.iml
+
+# vscode specific git ignore
+.vscode/
+
+# kotlin specific git ignore
+.kotlin/
+
+# build path
+.gradle
+build/
+# specific directory (루트의 data 폴더만 무시, jspring-data 등은 허용)
+/data/
+bin/
+tmp/
+dat/
+log/
+logs/
+out/
+*.tmp
+*.bak
+*.swp
+compile*.log
+compile*.txt
+*~.nib
+.DS_Store
+jrebel-*
+.aider*
+.env
+
+# managed by ai
+.openhands/TASKS.md
+/.claude/settings.local.json
+NOTHING.md
+/nul
+/tmpclaude-*-cwd
+/,
+/*.jpg
+/*.png
+/*.webp
+
+# Auto Claude data directory
+.auto-claude/
+/.claude_settings.json
+.auto-claude-status
+.claude/worktrees
+
+# Git Worktrees
+.worktrees/

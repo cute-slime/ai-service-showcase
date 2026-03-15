@@ -1,0 +1,128 @@
+logging:
+  level:
+    root: INFO
+    com.jongmin.ai: DEBUG
+    org.hibernate.SQL: WARN
+
+server:
+  port: ${SERVER_PORT:8083}
+
+spring:
+  main:
+    allow-bean-definition-overriding: true
+
+  config:
+    import:
+      - j-config.yml
+
+  application:
+    name: ai-service
+
+  messages:
+    basename: messages/sql
+    encoding: UTF-8
+
+  # PostgreSQL (CloudNativePG)
+  datasource:
+    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/pg}
+    username: ${DATABASE_USERNAME:app_user}
+    password: ${DATABASE_PASSWORD:}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      pool-name: AiService-HikariPool-Local
+      maximum-pool-size: 3
+      minimum-idle: 1
+      idle-timeout: 300000
+      max-lifetime: 1800000
+      connection-timeout: 30000
+
+  # JPA / Hibernate
+  jpa:
+    open-in-view: false
+    show-sql: false
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        default_schema: ai
+        format_sql: true
+        jdbc:
+          batch_size: 50
+          time_zone: Asia/Seoul
+        order_inserts: true
+        order_updates: true
+
+  # Redis
+  data:
+    web:
+      pageable:
+        one-indexed-parameters: true
+    redis:
+      database: ${REDIS_DATABASE:1}
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
+
+  # Kafka
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+
+  # Cassandra
+  cassandra:
+    contact-points: ${CASSANDRA_CONTACT_POINTS:localhost}
+    local-datacenter: ${CASSANDRA_DATACENTER:datacenter1}
+    keyspace-name: ${CASSANDRA_KEYSPACE:ai_service}
+    username: ${CASSANDRA_USERNAME:cassandra}
+    password: ${CASSANDRA_PASSWORD:}
+
+# Actuator
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus,circuitbreakers
+  endpoint:
+    health:
+      show-details: always
+  health:
+    circuitbreakers:
+      enabled: true
+
+# Springdoc (Swagger)
+springdoc:
+  api-docs:
+    enabled: ${SPRINGDOC_API_DOCS_ENABLED:true}
+  swagger-ui:
+    enabled: ${SPRINGDOC_SWAGGER_UI_ENABLED:true}
+
+# Resilience4j Circuit Breaker 설정
+resilience4j:
+  circuitbreaker:
+    configs:
+      default:
+        slidingWindowType: COUNT_BASED
+        slidingWindowSize: 10
+        failureRateThreshold: 50
+        waitDurationInOpenState: 30s
+        permittedNumberOfCallsInHalfOpenState: 5
+        slowCallRateThreshold: 80
+        slowCallDurationThreshold: 5s
+    instances:
+      aiService:
+        baseConfig: default
+        failureRateThreshold: 30    # LLM 비용 보호 - 더 민감하게
+        waitDurationInOpenState: 60s # 느린 복구 허용
+        slowCallDurationThreshold: 30s  # LLM 응답은 느릴 수 있음
+      openaiClient:
+        baseConfig: default
+        failureRateThreshold: 30
+        waitDurationInOpenState: 60s
+      anthropicClient:
+        baseConfig: default
+        failureRateThreshold: 30
+        waitDurationInOpenState: 60s
+      externalApi:
+        baseConfig: default
